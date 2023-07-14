@@ -13,8 +13,17 @@ class User extends Sequelize.Model {
           autoIncrement: true,
           primaryKey: true,
         },
+        userEmail: {
+          type: Sequelize.STRING(40),
+          allowNull: false,
+          unique: false,
+        },
         userName: {
-          type: Sequelize.STRING(15),
+          type: Sequelize.STRING(20),
+          allowNull: false,
+        },
+        userPwd: {
+          type: Sequelize.STRING(100),
           allowNull: false,
         },
         planetCode: {
