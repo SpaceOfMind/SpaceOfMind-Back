@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const user = require("./user");
 const around = require("./around");
+const away = require("./away");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -12,5 +13,6 @@ router.get("/", function (req, res, next) {
 
 router.use("/user", user);
 router.use("/around", around);
+router.use("/away", away);
 
 module.exports = router;
