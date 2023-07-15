@@ -26,6 +26,14 @@ class User extends Sequelize.Model {
           type: Sequelize.STRING(100),
           allowNull: false,
         },
+        snsId: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
+        provider: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
         planetCode: {
           type: Sequelize.INTEGER,
           allowNull: false,
