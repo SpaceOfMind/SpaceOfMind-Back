@@ -2,6 +2,8 @@ var createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const passport = require("passport");
 const logger = require("morgan");
 const db = require("./database/models/index");
 const cors = require("cors");
@@ -9,11 +11,22 @@ require("dotenv").config();
 
 const { sequelize } = require("./database/models");
 
-const indexRouter = require("./routes/index");
-const userRouter = require("./routes/user");
-const aroundRouter = require("./routes/around");
+const indexRouter = require("./routes");
+const passportConfig = require("./passport");
 
 const app = express();
+passportConfig();
+
+// 세션 설정
+const sessionMiddleware = session({
+  resave: false,
+  saveUninitialized: false,
+  secret: `${process.env.COOKIE_SECRET}`,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+  },
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -30,18 +43,35 @@ app.use(logger("dev"));
 // CORS 전부 오픈
 app.use(cors());
 
-// request 본문 해석용 미들웨어
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
 
-// request의 쿠키 해석용 미들웨어
-app.use(cookieParser());
-
+// static 파일을 접근할 수 있도록 해주는 미들웨어
 app.use(express.static(path.join(__dirname, "public")));
 
+// request 본문 해석용 미들웨어
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// request의 쿠키를 해석해주는 미들웨어
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(sessionMiddleware);
+
+// passport 설정
+app.use(passport.initialize());
+app.use(passport.session());
+
+// index router
 app.use("/", indexRouter);
-app.use("/user", userRouter);
-app.use("/around", aroundRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
