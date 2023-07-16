@@ -41,7 +41,7 @@ app.set("view engine", "jade");
 app.use(logger("dev"));
 
 // CORS 전부 오픈
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 
 app.use(
   session({
@@ -49,7 +49,7 @@ app.use(
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
     cookie: {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     },
   })
@@ -69,11 +69,6 @@ app.use(sessionMiddleware);
 // passport 설정
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // cors, 다른 도메인에서의 접근 허용
-  next();
-});
 
 // index router
 app.use("/", indexRouter);
