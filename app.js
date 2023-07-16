@@ -70,6 +70,11 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // cors, 다른 도메인에서의 접근 허용
+  next();
+});
+
 // index router
 app.use("/", indexRouter);
 

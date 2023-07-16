@@ -81,8 +81,8 @@ exports.signUp = async (req, res, next) => {
     }
 
     res.status(201);
-    res.set("Content-Type", "text/plain");
-    return res.send("Signup Success!");
+    res.set("Content-Type", "application/json");
+    return res.status(200).json({ result: "success" });
   } catch (err) {
     console.error(err);
     return next(err);
@@ -95,9 +95,9 @@ exports.logout = (req, res, next) => {
     if (err) {
       return next(err);
     } else {
-      req.session.destroy(); // 로그인인증 수단으로 사용한 세션쿠키를 지우고 파괴한다. 세션쿠키가 없다는 말은 즉 로그아웃 인 말.
-      res.set("Content-Type", "text/plain");
-      return res.send("Logout Success!");
+      req.session.destroy(); // 로그인 인증 수단으로 사용한 세션쿠키를 지우고 파괴한다. 세션쿠키가 없다는 말은 즉 로그아웃 인 말.
+      res.set("Content-Type", "application/json");
+      return res.status(200).json({ result: "success" });
     }
   });
 };
