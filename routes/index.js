@@ -5,6 +5,7 @@ const user = require("./user");
 const auth = require("./auth");
 const around = require("./around");
 const away = require("./away");
+const archive = require("./archive");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -16,5 +17,6 @@ router.use("/user", user);
 router.use("/auth", auth);
 router.use("/around", around);
 router.use("/away", away);
+router.use("/archive", archive);
 
 module.exports = router;

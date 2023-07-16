@@ -7,7 +7,6 @@ away.use((req, res, next) => {
   next();
 });
 
-
 away.get("/getInfo", awayCtrl.getInfo);
 away.post("/postInfo", awayCtrl.postInfo);
 away.delete("/deleteInfo", awayCtrl.deleteInfo);
