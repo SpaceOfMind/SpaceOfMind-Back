@@ -41,7 +41,7 @@ app.set("view engine", "jade");
 app.use(logger("dev"));
 
 // CORS 전부 오픈
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 
 app.use(
   session({
@@ -49,7 +49,7 @@ app.use(
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
     cookie: {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     },
   })

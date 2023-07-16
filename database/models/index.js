@@ -3,6 +3,7 @@
 const Sequelize = require("sequelize");
 const process = require("process");
 const User = require("./user");
+const Archive = require("./archive");
 const Around = require("./around");
 const Away = require("./away");
 const env = process.env.NODE_ENV || "development";
@@ -28,10 +29,12 @@ db.sequelize = sequelize;
 
 // model이 작성된 파일을 찾아서 db 객체에 삽입
 db.User = User;
+db.Archive = Archive;
 db.Around = Around;
 db.Away = Away;
 
 User.init(sequelize);
+Archive.init(sequelize);
 Around.init(sequelize);
 Away.init(sequelize);
 
