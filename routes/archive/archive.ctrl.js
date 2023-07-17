@@ -10,9 +10,15 @@ exports.getAround = async (req, res) => {
 
   try {
     const result = await Archive.findAll({
-      attributes: ["colorCode", "orbitId", "title", "content"],
-      where: { userId: userId, isAround: true },
+      attributes: ["colorCode", "orbitId", "title", "content", "createdAt"],
+      where: { userId: userId, 
+        orbitId: {
+          [Op.gt]: 0
+        },
+        isAround: true },
     });
+
+    // console.log(result);
     return res.json({ result: "success", userId: userId, arounds: result });
   } catch (error) {
     console.error("Error occurred while querying the database:", error);
@@ -30,8 +36,12 @@ exports.getAway = async (req, res) => {
 
   try {
     const result = await Archive.findAll({
-      attributes: ["colorCode", "orbitId", "title", "content"],
-      where: { userId: userId, isAround: false },
+      attributes: ["colorCode", "orbitId", "title", "content", "createdAt"],
+      where: { userId: userId,
+        orbitId: {
+          [Op.gt]: 0
+        }, 
+        isAround: false },
     });
     return res.json({ result: "success", userId: userId, aways: result });
   } catch (error) {
@@ -75,7 +85,7 @@ exports.postInfo = async (req, res) => {
       return res.json({ result: "full"});    // result 를 full 로 return!
 
     } else {
-      orbitId = filledOrbits;
+      orbitId = filledOrbits + 1;           // orbitId 는 1부터 5니까!
     }
 
     await Archive.create({
