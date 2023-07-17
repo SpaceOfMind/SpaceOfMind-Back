@@ -1,5 +1,6 @@
 const Archive = require("../../database/models/archive");
 const User = require("../../database/models/user");
+const { Op } = require('sequelize');
 
 // GET around
 exports.getAround = async (req, res) => {
@@ -46,13 +47,35 @@ exports.postInfo = async (req, res) => {
   console.log("[archiveCtrl] post logic");
 
   try {
-    const { userId, colorCode, orbitId, title, content, isAround } = req.body;
+    const { userId, colorCode, title, content, isAround } = req.body;
     const user = await User.findOne({ where: { userId } });
 
     if (user == null) {
       return res
         .status(401)
         .json({ result: "fail", error: "UserId does not exist" });
+    };
+
+    // orbitId 찾는 로직
+    const inOrbits = await Archive.findAll({ 
+      where: { 
+        orbitId: { 
+          [Op.gt]: 0 
+        }, 
+        isAround: isAround
+      }
+    });
+
+    const filledOrbits = inOrbits.length;
+    let orbitId;
+
+    // orbitId 순차적으로 지정
+    if (filledOrbits >= 5) {
+      // 더 추가할 수 없음
+      return res.json({ result: "full"});    // result 를 full 로 return!
+
+    } else {
+      orbitId = filledOrbits;
     }
 
     await Archive.create({
