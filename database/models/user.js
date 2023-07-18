@@ -34,11 +34,15 @@ class User extends Sequelize.Model {
           type: Sequelize.STRING(40),
           allowNull: true,
         },
-        planetCode: {
+        colorCode: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0,
         },
+        planetCode: {
+          type: Sequelize.STRING(10),
+          allowNull: false,
+        }
       },
       {
         // 두번째 parameter: table 자체에 대한 설정
