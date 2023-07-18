@@ -30,14 +30,52 @@ exports.login = (req, res, next) => {
         return next(loginError);
       }
       //return res.status(200).redirect("/"); // 세션 쿠키를 브라우저로 전송
-      return res.status(201).json({ result: "success", userId: user.userId });
+      return res.status(201).json({ result: "success", userId: user.userId, planetCode: user.planetCode });
     });
   })(req, res, next);
 };
 
+// 랜덤 string 만드는 helper function
+function generateRandomString(length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const nums = '0123456789';
+  let randomString = '';
+
+  for (let i = 0; i < length; i++) {
+    const charOrNum = Math.random() < 0.5 ? chars : nums;
+    const randomIndex = Math.floor(Math.random() * charOrNum.length);
+    randomString += charOrNum[randomIndex];
+  }
+
+  return randomString;
+}
+
+async function isPlanetCodeExists(planetCode) {
+  const user = await User.findOne({ where: { planetCode }});
+  if (user == null) return false;
+  else return true;
+}
+
+// Function to generate a unique planetCode
+async function generateUniquePlanetCode() {
+  const planetCodeLength = 3;
+  const numberLength = 3;
+
+  let planetCode;
+
+  // Generate a random planetCode
+  do {
+    const randomFirst = generateRandomString(planetCodeLength);
+    const randomSecond = generateRandomString(numberLength);
+    planetCode = `${randomFirst}-${randomSecond}`;
+  } while (await isPlanetCodeExists(planetCode));
+
+  return planetCode;
+}
+
 exports.signUp = async (req, res, next) => {
-  console.log("singUp logic");
-  const { userEmail, userName, userPwd, planetCode, snsId, provider } =
+  console.log("signUp logic");
+  const { userEmail, userName, userPwd, snsId, provider, colorCode } =
     req.body;
   try {
     // 기존에 해당 이메일로 가입한 사람이 있나 검사 (중복 가입 방지)
@@ -59,24 +97,34 @@ exports.signUp = async (req, res, next) => {
     if (snsId == null) {
       // 정상적인 회원가입 절차면 해시화
       const hash = await bcrypt.hash(userPwd, 12);
+
+      // planetCode 생성
+      const planetCode = await generateUniquePlanetCode();
+
       // DB에 해당 회원정보 생성
       await User.create({
         userEmail,
         userName,
         userPwd: hash, // 비밀번호에 해시문자를 넣어준다.
-        planetCode,
+        colorCode,
+        planetCode
       });
     } else {
       /* social sign up */
       console.log("sign up with sns");
       const hash = await bcrypt.hash(snsId, 10); // snsId를 local DB에 저장하기 위한 pw로 사용
+
+      // planetCode 생성
+      const planetCode = await generateUniquePlanetCode();
+
       await User.create({
         userEmail, // 유저가 sns에 가입한 email(정보 제공 동의)
         userName,
         userPwd: hash,
-        planetCode,
         snsId,
         provider,
+        colorCode,
+        planetCode
       });
     }
 

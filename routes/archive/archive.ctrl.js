@@ -41,7 +41,11 @@ exports.getAway = async (req, res) => {
         orbitId: {
           [Op.gte]: 0
         }, 
-        isAround: false },
+        isAround: false,
+        from: {
+          [Op.is]: null
+        }
+       },
     });
     return res.json({ result: "success", userId: userId, aways: result });
   } catch (error) {
@@ -52,12 +56,26 @@ exports.getAway = async (req, res) => {
   }
 };
 
+// 해당 planetCode를 가진 유저의 아이디 리턴
+async function findPlanetCodeUser(destination) {
+  const receiver = await User.findOne({ where: { planetCode: destination }});
+  console.log("Receiver: ", receiver);
+  return receiver.dataValues.userId;
+}
+
+// 해당 유저 아이디를 가진 유저의 planetCode 찾기
+async function findUserPlanetCode(userId) {
+  const sender = await User.findOne({ where: { userId }});
+  console.log("sender: ", sender);
+  return sender.dataValues.planetCode;
+}
+
 // POST archive
 exports.postInfo = async (req, res) => {
   console.log("[archiveCtrl] post logic");
 
   try {
-    const { userId, colorCode, title, content, isAround } = req.body;
+    const { userId, colorCode, title, destination, content, isAround } = req.body;
     const user = await User.findOne({ where: { userId } });
 
     if (user == null) {
@@ -88,14 +106,33 @@ exports.postInfo = async (req, res) => {
       orbitId = filledOrbits;           // orbitId 는 0 부터 4 까지
     }
 
-    await Archive.create({
-      userId,
-      colorCode,
-      orbitId,
-      title,
-      content,
-      isAround,
-    });
+    // 남에게 보내는 탐사선일 경우
+    if (destination) {
+      const receiverId = await findPlanetCodeUser(destination);
+      const senderCode = await findUserPlanetCode(userId);
+      await Archive.create({
+        userId: receiverId,
+        colorCode,
+        orbitId,
+        title,
+        content,
+        isAround,
+        from: senderCode
+      })
+      console.log(`${destination}의 archive db에 생성 완료`);
+    } else {
+
+      // 내 우주로 탐사선 발사
+      await Archive.create({
+        userId,
+        colorCode,
+        orbitId,
+        title,
+        content,
+        isAround,
+      });
+
+    }
     res.set("Content-Type", "application/json");
     return res.status(200).json({ result: "success" });
   } catch (error) {
@@ -179,7 +216,7 @@ exports.getAll = async (req, res) => {
 
   try {
     const result = await Archive.findAll({
-      attributes: ["createdAt", "title", "content", "isAround"],
+      attributes: ["createdAt", "title", "content", "isAround", "from"],
       where: { userId: userId },
       order: ["createdAt"],
     });
