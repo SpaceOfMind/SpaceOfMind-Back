@@ -30,7 +30,7 @@ exports.login = (req, res, next) => {
         return next(loginError);
       }
       //return res.status(200).redirect("/"); // 세션 쿠키를 브라우저로 전송
-      return res.status(201).json({ result: "success", userId: user.userId, planetCode: user.planetCode });
+      return res.status(201).json({ result: "success", userId: user.userId, userName: user.userName, planetCode: user.planetCode });
     });
   })(req, res, next);
 };
