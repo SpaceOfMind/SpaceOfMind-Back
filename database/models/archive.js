@@ -38,6 +38,10 @@ class Archive extends Sequelize.Model {
           type: Sequelize.BOOLEAN,
           allowNull: false,
         },
+        from: { // nullable
+          type: Sequelize.STRING(10),
+          allowNull: true,
+        }
       },
       {
         // 두번째 parameter: table 자체에 대한 설정
