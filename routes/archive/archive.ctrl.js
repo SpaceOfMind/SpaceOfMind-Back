@@ -13,7 +13,7 @@ exports.getAround = async (req, res) => {
       attributes: ["colorCode", "orbitId", "title", "content", "createdAt"],
       where: { userId: userId, 
         orbitId: {
-          [Op.gt]: 0
+          [Op.gte]: 0
         },
         isAround: true },
     });
@@ -39,7 +39,7 @@ exports.getAway = async (req, res) => {
       attributes: ["colorCode", "orbitId", "title", "content", "createdAt"],
       where: { userId: userId,
         orbitId: {
-          [Op.gt]: 0
+          [Op.gte]: 0
         }, 
         isAround: false },
     });
@@ -70,7 +70,7 @@ exports.postInfo = async (req, res) => {
     const inOrbits = await Archive.findAll({ 
       where: { 
         orbitId: { 
-          [Op.gt]: 0 
+          [Op.gte]: 0 
         }, 
         isAround: isAround
       }
@@ -85,7 +85,7 @@ exports.postInfo = async (req, res) => {
       return res.json({ result: "full"});    // result 를 full 로 return!
 
     } else {
-      orbitId = filledOrbits + 1;           // orbitId 는 1부터 5니까!
+      orbitId = filledOrbits;           // orbitId 는 0 부터 4 까지
     }
 
     await Archive.create({
