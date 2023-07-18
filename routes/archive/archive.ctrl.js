@@ -87,6 +87,7 @@ exports.postInfo = async (req, res) => {
     // orbitId 찾는 로직
     const inOrbits = await Archive.findAll({ 
       where: { 
+        userId: userId,
         orbitId: { 
           [Op.gte]: 0 
         }, 
